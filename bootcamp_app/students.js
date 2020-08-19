@@ -21,12 +21,14 @@ LIMIT 5;
   .catch((err) => console.error("query error", err.stack));
 
 const [, , date, limit] = process.argv;
+const values = [`%${date}%`, limit || 5];
 pool
   .query(
     `SELECT students.id as id, students.name as student, cohorts.name as cohort
     FROM students JOIN cohorts ON cohort_id = cohorts.id
-    WHERE cohorts.name LIKE '${date}%'
-    LIMIT ${limit || 5};`
+    WHERE cohorts.name LIKE $1
+    LIMIT $2;`,
+    values
   )
   .then((res) => {
     res.rows.forEach((user) => {
